@@ -49,7 +49,7 @@ typedef struct elite_driver_robot_exception_t {
     const char* message;
 } elite_driver_robot_exception_t;
 
-typedef void (*elite_driver_trajectory_result_cb_t)(int32_t result, void* user_data);
+typedef void (*elite_driver_trajectory_result_cb_t)(elite_trajectory_motion_result_t result, void* user_data);
 typedef void (*elite_driver_robot_exception_cb_t)(const elite_driver_robot_exception_t* ex, void* user_data);
 
 ELITE_C_EXPORT void elite_driver_config_set_default(elite_driver_config_t* config);
@@ -74,19 +74,22 @@ ELITE_C_EXPORT elite_c_status_t elite_driver_set_trajectory_result_callback(elit
 ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_point(elite_driver_handle_t* handle, const double* positions6,
                                                                     float time, float blend_radius, int32_t cartesian,
                                                                     int32_t* out_success);
-ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handle_t* handle, int32_t action,
+ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handle_t* handle,
+                                                                             elite_trajectory_control_action_t action,
                                                                              int32_t point_number, int32_t timeout_ms,
                                                                              int32_t* out_success);
-ELITE_C_EXPORT elite_c_status_t elite_driver_write_freedrive(elite_driver_handle_t* handle, int32_t action, int32_t timeout_ms,
+ELITE_C_EXPORT elite_c_status_t elite_driver_write_freedrive(elite_driver_handle_t* handle,
+                                                             elite_freedrive_action_t action, int32_t timeout_ms,
                                                              int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_zero_ft_sensor(elite_driver_handle_t* handle, int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_set_payload(elite_driver_handle_t* handle, double mass, const double* cog3,
                                                          int32_t* out_success);
-ELITE_C_EXPORT elite_c_status_t elite_driver_set_tool_voltage(elite_driver_handle_t* handle, int32_t voltage,
+ELITE_C_EXPORT elite_c_status_t elite_driver_set_tool_voltage(elite_driver_handle_t* handle, elite_tool_voltage_t voltage,
                                                               int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_start_force_mode(elite_driver_handle_t* handle, const double* reference_frame6,
                                                               const int32_t* selection_vector6, const double* wrench6,
-                                                              int32_t mode, const double* limits6, int32_t* out_success);
+                                                              elite_force_mode_t mode, const double* limits6,
+                                                              int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_end_force_mode(elite_driver_handle_t* handle, int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_send_script(elite_driver_handle_t* handle, const char* script, int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_get_primary_package(elite_driver_handle_t* handle, int32_t timeout_ms,

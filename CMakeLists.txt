@@ -5,6 +5,7 @@ include(FetchContent)
 
 set(ELITE_C_WRAPPER_TARGET elite_cs_series_sdk_c)
 option(ELITE_AUTO_FETCH_SDK "Auto download Elite CS SDK when not found" OFF)
+option(ELITE_BUILD_EXAMPLES "Build example programs" OFF)
 
 set(
     ELITE_C_WRAPPER_SOURCES
@@ -81,6 +82,11 @@ target_include_directories(
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE)
     set_target_properties(${ELITE_C_WRAPPER_TARGET} PROPERTIES OUTPUT_NAME "elite_cs_series_sdk_c")
+endif()
+
+if(ELITE_BUILD_EXAMPLES)
+    message(STATUS "Build examples")
+    add_subdirectory(examples)
 endif()
 
 if(ELITE_INSTALL)

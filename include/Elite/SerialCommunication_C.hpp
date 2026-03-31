@@ -16,9 +16,9 @@ extern "C" {
 typedef struct elite_serial_comm_handle_t elite_serial_comm_handle_t;
 
 typedef struct elite_serial_config_t {
-    int32_t baud_rate;
-    int32_t parity;
-    int32_t stop_bits;
+    elite_serial_baud_rate_t baud_rate;
+    elite_serial_parity_t parity;
+    elite_serial_stop_bits_t stop_bits;
 } elite_serial_config_t;
 
 ELITE_C_EXPORT elite_c_status_t elite_serial_comm_connect(elite_serial_comm_handle_t* comm, int32_t timeout_ms,

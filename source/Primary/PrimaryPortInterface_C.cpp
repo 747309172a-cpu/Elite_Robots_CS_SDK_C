@@ -228,16 +228,16 @@ elite_c_status_t elite_primary_get_kinematics_info(elite_primary_handle_t* handl
 
 elite_c_status_t elite_primary_register_robot_exception_callback(elite_primary_handle_t* handle,
                                                                  elite_primary_robot_exception_cb_t cb, void* user_data) {
-    if (!cb) {
-        set_global_error("callback is null");
-        return ELITE_C_STATUS_INVALID_ARGUMENT;
-    }
-
     return run_with_handle(handle, [&]() {
         {
             std::lock_guard<std::mutex> lock(handle->callback_state->mutex);
             handle->callback_state->cb = cb;
             handle->callback_state->user_data = user_data;
+        }
+
+        if (!cb) {
+            handle->primary->registerRobotExceptionCallback(nullptr);
+            return;
         }
 
         auto state = handle->callback_state;

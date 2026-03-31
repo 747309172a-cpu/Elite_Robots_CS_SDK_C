@@ -309,7 +309,7 @@ elite_c_status_t elite_driver_set_trajectory_result_callback(elite_driver_handle
             if (!local_cb) {
                 return;
             }
-            local_cb(static_cast<int32_t>(result), local_user_data);
+            local_cb(static_cast<elite_trajectory_motion_result_t>(result), local_user_data);
         });
     });
 }
@@ -327,7 +327,7 @@ elite_c_status_t elite_driver_write_trajectory_point(elite_driver_handle_t* hand
     });
 }
 
-elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handle_t* handle, int32_t action,
+elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handle_t* handle, elite_trajectory_control_action_t action,
                                                               int32_t point_number, int32_t timeout_ms,
                                                               int32_t* out_success) {
     if (!out_success) {
@@ -344,7 +344,7 @@ elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handl
     });
 }
 
-elite_c_status_t elite_driver_write_freedrive(elite_driver_handle_t* handle, int32_t action, int32_t timeout_ms,
+elite_c_status_t elite_driver_write_freedrive(elite_driver_handle_t* handle, elite_freedrive_action_t action, int32_t timeout_ms,
                                               int32_t* out_success) {
     if (!out_success) {
         set_global_error("out_success is null");
@@ -377,7 +377,8 @@ elite_c_status_t elite_driver_set_payload(elite_driver_handle_t* handle, double 
     });
 }
 
-elite_c_status_t elite_driver_set_tool_voltage(elite_driver_handle_t* handle, int32_t voltage, int32_t* out_success) {
+elite_c_status_t elite_driver_set_tool_voltage(elite_driver_handle_t* handle, elite_tool_voltage_t voltage,
+                                               int32_t* out_success) {
     if (!out_success) {
         set_global_error("out_success is null");
         return ELITE_C_STATUS_INVALID_ARGUMENT;
@@ -389,8 +390,8 @@ elite_c_status_t elite_driver_set_tool_voltage(elite_driver_handle_t* handle, in
 }
 
 elite_c_status_t elite_driver_start_force_mode(elite_driver_handle_t* handle, const double* reference_frame6,
-                                               const int32_t* selection_vector6, const double* wrench6, int32_t mode,
-                                               const double* limits6, int32_t* out_success) {
+                                               const int32_t* selection_vector6, const double* wrench6,
+                                               elite_force_mode_t mode, const double* limits6, int32_t* out_success) {
     if (!reference_frame6 || !selection_vector6 || !wrench6 || !limits6 || !out_success) {
         set_global_error("input buffers or out_success is null");
         return ELITE_C_STATUS_INVALID_ARGUMENT;

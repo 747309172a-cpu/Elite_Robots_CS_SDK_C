@@ -1,4 +1,4 @@
-## [Unrelease]
+## [Unreleased]
 
 ### Initial Release
 

@@ -33,7 +33,7 @@ cmake --build build --config Release
 
 - 下文 Linux 运行命令默认写成 `./build/examples/<example-name> ...`
 - 下文 Windows 运行命令默认写成 `.\build\examples\Release\<example-name>.exe ...`
-- `rtsi_example` 建议从仓库根目录运行，以便正确找到 `examples/resource/input_recipe.txt` 和 `examples/resource/output_recipe.txt`
+- 建议从仓库根目录运行，以便正确找到 `examples/resource/input_recipe.txt` 和 `examples/resource/output_recipe.txt`
 
 ## Dashboard 模块
 

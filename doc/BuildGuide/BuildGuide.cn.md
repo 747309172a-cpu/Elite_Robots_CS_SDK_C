@@ -1,5 +1,5 @@
 # 编译安装指南
-## Requirements
+## 要求
 
 * SDK中的socket使用了 **boost::asio**。 因此需要安装 **boost** 库。
 * 此 C 包装层需要支持 **C++17** 的编译器。
@@ -51,14 +51,13 @@ cmake -S . -B build -DELITE_AUTO_FETCH_SDK=ON -DELITE_INSTALL=ON -DELITE_BUILD_E
 
 cmake --build build -j4
 ```
+`开启 ELITE_BUILD_EXAMPLES 后，会自动编译 examples 目录下所有 .c 示例程序。默认输出到 build/examples/`
 `安装编译好的 c 库到系统目录，可由 CMAKE_INSTALL_PREFIX 指定目录`:
 ```bash
 sudo cmake --install build
 
 sudo ldconfig
 ```
-
-`开启 ELITE_BUILD_EXAMPLES 后，会自动编译 examples 目录下所有 .c 示例程序。默认输出到 build/examples/`
 
 examples 使用说明见：
 [examples/usage_example.md](../../examples/usage_example.md)
@@ -75,11 +74,11 @@ cmake -S . -B build `
   
 cmake --build build --config Release
 ```
+`开启 ELITE_BUILD_EXAMPLES 后，会自动编译 examples 目录下所有 .c 示例程序。默认输出build\examples\Release\`
 `安装目录可由 CMAKE_INSTALL_PREFIX 指定`:
 ```powershell
 cmake --install build --config Release
 ```
-`开启 ELITE_BUILD_EXAMPLES 后，会自动编译 examples 目录下所有 .c 示例程序。默认输出build\examples\Release\`
 
 examples 使用说明见：
 [examples/usage_example.md](../../examples/usage_example.md)

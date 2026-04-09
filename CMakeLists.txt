@@ -33,7 +33,12 @@ target_compile_features(${ELITE_C_WRAPPER_TARGET} PRIVATE cxx_std_17)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_compile_definitions(${ELITE_C_WRAPPER_TARGET} PRIVATE ELITE_C_EXPORT_LIBRARY)
+
+    if(ELITE_LINK_UPSTREAM_STATIC)
+        target_compile_definitions(${ELITE_C_WRAPPER_TARGET} PRIVATE ELITE_STATIC_LIBRARY)
+    endif()
 endif()
+
 
 find_package(elite-cs-series-sdk CONFIG QUIET)
 if(NOT TARGET elite-cs-series-sdk::shared AND NOT TARGET elite-cs-series-sdk::static)

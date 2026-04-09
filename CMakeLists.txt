@@ -7,6 +7,12 @@ set(ELITE_C_WRAPPER_TARGET elite_cs_series_sdk_c)
 option(ELITE_AUTO_FETCH_SDK "Auto download Elite CS SDK when not found" OFF)
 option(ELITE_BUILD_EXAMPLES "Build example programs" OFF)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    option(ELITE_LINK_UPSTREAM_STATIC "Link against the upstream static SDK target" ON)
+else()
+    option(ELITE_LINK_UPSTREAM_STATIC "Link against the upstream static SDK target" OFF)
+endif()
+
 set(
     ELITE_C_WRAPPER_SOURCES
     source/Dashboard/DashboardClient_C.cpp
@@ -30,7 +36,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
 find_package(elite-cs-series-sdk CONFIG QUIET)
-if(NOT TARGET elite-cs-series-sdk::shared)
+if(NOT TARGET elite-cs-series-sdk::shared AND NOT TARGET elite-cs-series-sdk::static)
     if(ELITE_AUTO_FETCH_SDK)
         message(STATUS "elite-cs-series-sdk not found locally, fetching from remote repository...")
 
@@ -58,20 +64,33 @@ if(NOT TARGET elite-cs-series-sdk::shared)
         )
         FetchContent_MakeAvailable(elite_cs_sdk)
 
-        # Upstream exports elite_cs_series_sdk_SHARED; create expected alias if needed.
+        # Upstream exports elite_cs_series_sdk_SHARED / STATIC; create expected aliases if needed.
         if(TARGET elite_cs_series_sdk_SHARED AND NOT TARGET elite-cs-series-sdk::shared)
             add_library(elite-cs-series-sdk::shared ALIAS elite_cs_series_sdk_SHARED)
+        endif()
+        if(TARGET elite_cs_series_sdk_STATIC AND NOT TARGET elite-cs-series-sdk::static)
+            add_library(elite-cs-series-sdk::static ALIAS elite_cs_series_sdk_STATIC)
         endif()
     endif()
 endif()
 
-if(NOT TARGET elite-cs-series-sdk::shared)
-    message(FATAL_ERROR
-        "Cannot find elite-cs-series-sdk::shared. "
-        "Set CMAKE_PREFIX_PATH to a valid SDK install, or use -DELITE_AUTO_FETCH_SDK=ON.")
+if(ELITE_LINK_UPSTREAM_STATIC)
+    if(NOT TARGET elite-cs-series-sdk::static)
+        message(FATAL_ERROR
+            "Cannot find elite-cs-series-sdk::static. "
+            "Set CMAKE_PREFIX_PATH to a valid SDK install, or use -DELITE_AUTO_FETCH_SDK=ON.")
+    endif()
+    set(ELITE_UPSTREAM_SDK_TARGET elite-cs-series-sdk::static)
+else()
+    if(NOT TARGET elite-cs-series-sdk::shared)
+        message(FATAL_ERROR
+            "Cannot find elite-cs-series-sdk::shared. "
+            "Set CMAKE_PREFIX_PATH to a valid SDK install, or use -DELITE_AUTO_FETCH_SDK=ON.")
+    endif()
+    set(ELITE_UPSTREAM_SDK_TARGET elite-cs-series-sdk::shared)
 endif()
 
-target_link_libraries(${ELITE_C_WRAPPER_TARGET} PRIVATE elite-cs-series-sdk::shared)
+target_link_libraries(${ELITE_C_WRAPPER_TARGET} PRIVATE ${ELITE_UPSTREAM_SDK_TARGET})
 
 target_include_directories(
     ${ELITE_C_WRAPPER_TARGET}

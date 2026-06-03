@@ -13,7 +13,9 @@
 #include <Dashboard/DashboardClient_C.hpp>
 #include <Elite/ControllerLog_C.hpp>
 #include <Elite/EliteDriver_C.h>
+#include <Elite/Kinematics_C.hpp>
 #include <Elite/Log_C.hpp>
+#include <Elite/PoseAlgebra_C.hpp>
 #include <Elite/RemoteUpgrade_C.hpp>
 #include <Elite/SerialCommunication_C.hpp>
 #include <Elite/VersionInfo_C.hpp>

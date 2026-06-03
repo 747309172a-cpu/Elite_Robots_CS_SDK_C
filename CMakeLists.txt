@@ -17,6 +17,8 @@ set(
     ELITE_C_WRAPPER_SOURCES
     source/Dashboard/DashboardClient_C.cpp
     source/Elite/EliteDriver_C.cpp
+    source/Elite/Kinematics_C.cpp
+    source/Elite/PoseAlgebra_C.cpp
     source/Elite/ControllerLog_C.cpp
     source/Elite/Log_C.cpp
     source/Elite/RemoteUpgrade_C.cpp

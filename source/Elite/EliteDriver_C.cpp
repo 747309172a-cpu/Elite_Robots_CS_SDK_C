@@ -17,6 +17,8 @@ struct callback_state_t {
     std::mutex mutex;
     elite_driver_trajectory_result_cb_t trajectory_cb{nullptr};
     void* trajectory_user_data{nullptr};
+    elite_driver_trajectory_feedback_cb_t trajectory_feedback_cb{nullptr};
+    void* trajectory_feedback_user_data{nullptr};
     elite_driver_robot_exception_cb_t robot_exception_cb{nullptr};
     void* robot_exception_user_data{nullptr};
 };
@@ -124,6 +126,15 @@ inline void fill_robot_exception_payload(const ELITE::RobotExceptionSharedPtr& e
         out_payload->message = io_message_buf->c_str();
     }
 }
+
+inline void fill_trajectory_feedback_payload(const ELITE::TrajectoryMotionFeedback& in,
+                                             elite_trajectory_motion_feedback_t* out_payload) {
+    out_payload->message_type = static_cast<elite_trajectory_feedback_message_type_t>(in.message_type);
+    out_payload->point_index = in.point_index;
+    out_payload->total_points = in.total_points;
+    out_payload->result = in.result;
+    copy_vector6_to_buffer(in.point, out_payload->point);
+}
 }  // namespace
 
 void elite_driver_config_set_default(elite_driver_config_t* config) {
@@ -143,6 +154,10 @@ void elite_driver_config_set_default(elite_driver_config_t* config) {
     config->servoj_lookahead_time = 0.1f;
     config->servoj_gain = 300;
     config->stopj_acc = 8.0f;
+    config->servoj_extrapolate_max_time = 0.08f;
+    config->servoj_decelerate_time = 0.01f;
+    config->servoj_hold_velocity_threshold = 0.05f;
+    config->servoj_hold_stable_time = 0.04f;
 }
 
 elite_c_status_t elite_driver_create(const elite_driver_config_t* config, elite_driver_handle_t** out_handle) {
@@ -171,6 +186,10 @@ elite_c_status_t elite_driver_create(const elite_driver_config_t* config, elite_
         driver_config.servoj_lookahead_time = config->servoj_lookahead_time;
         driver_config.servoj_gain = config->servoj_gain;
         driver_config.stopj_acc = config->stopj_acc;
+        driver_config.servoj_extrapolate_max_time = config->servoj_extrapolate_max_time;
+        driver_config.servoj_decelerate_time = config->servoj_decelerate_time;
+        driver_config.servoj_hold_velocity_threshold = config->servoj_hold_velocity_threshold;
+        driver_config.servoj_hold_stable_time = config->servoj_hold_stable_time;
 
         handle->driver = std::make_unique<ELITE::EliteDriver>(driver_config);
         handle->callback_state = std::make_shared<callback_state_t>();
@@ -196,12 +215,15 @@ void elite_driver_destroy(elite_driver_handle_t* handle) {
     }
     if (handle->driver) {
         handle->driver->setTrajectoryResultCallback(nullptr);
+        handle->driver->setTrajectoryFeedbackCallback(nullptr);
         handle->driver->registerRobotExceptionCallback(nullptr);
     }
     if (handle->callback_state) {
         std::lock_guard<std::mutex> lock(handle->callback_state->mutex);
         handle->callback_state->trajectory_cb = nullptr;
         handle->callback_state->trajectory_user_data = nullptr;
+        handle->callback_state->trajectory_feedback_cb = nullptr;
+        handle->callback_state->trajectory_feedback_user_data = nullptr;
         handle->callback_state->robot_exception_cb = nullptr;
         handle->callback_state->robot_exception_user_data = nullptr;
     }
@@ -314,6 +336,40 @@ elite_c_status_t elite_driver_set_trajectory_result_callback(elite_driver_handle
     });
 }
 
+elite_c_status_t elite_driver_set_trajectory_feedback_callback(elite_driver_handle_t* handle,
+                                                               elite_driver_trajectory_feedback_cb_t cb, void* user_data) {
+    return run_with_handle(handle, [&]() {
+        {
+            std::lock_guard<std::mutex> lock(handle->callback_state->mutex);
+            handle->callback_state->trajectory_feedback_cb = cb;
+            handle->callback_state->trajectory_feedback_user_data = user_data;
+        }
+
+        if (!cb) {
+            handle->driver->setTrajectoryFeedbackCallback(nullptr);
+            return;
+        }
+
+        auto state = handle->callback_state;
+        handle->driver->setTrajectoryFeedbackCallback([state](const ELITE::TrajectoryMotionFeedback& feedback) {
+            elite_driver_trajectory_feedback_cb_t local_cb = nullptr;
+            void* local_user_data = nullptr;
+            {
+                std::lock_guard<std::mutex> lock(state->mutex);
+                local_cb = state->trajectory_feedback_cb;
+                local_user_data = state->trajectory_feedback_user_data;
+            }
+            if (!local_cb) {
+                return;
+            }
+
+            elite_trajectory_motion_feedback_t payload{};
+            fill_trajectory_feedback_payload(feedback, &payload);
+            local_cb(&payload, local_user_data);
+        });
+    });
+}
+
 elite_c_status_t elite_driver_write_trajectory_point(elite_driver_handle_t* handle, const double* positions6, float time,
                                                      float blend_radius, int32_t cartesian, int32_t* out_success) {
     if (!positions6 || !out_success) {
@@ -324,6 +380,21 @@ elite_c_status_t elite_driver_write_trajectory_point(elite_driver_handle_t* hand
     return run_with_handle(handle, [&]() {
         const ELITE::vector6d_t positions = to_vector6d(positions6);
         *out_success = handle->driver->writeTrajectoryPoint(positions, time, blend_radius, cartesian != 0) ? 1 : 0;
+    });
+}
+
+elite_c_status_t elite_driver_write_trajectory_point_with_speed(elite_driver_handle_t* handle, const double* positions6,
+                                                                float blend_radius, int32_t cartesian, float speed,
+                                                                float acceleration, int32_t* out_success) {
+    if (!positions6 || !out_success) {
+        set_global_error("positions6 or out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() {
+        const ELITE::vector6d_t positions = to_vector6d(positions6);
+        *out_success =
+            handle->driver->writeTrajectoryPoint(positions, blend_radius, cartesian != 0, speed, acceleration) ? 1 : 0;
     });
 }
 

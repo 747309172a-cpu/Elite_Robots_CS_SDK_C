@@ -31,6 +31,10 @@ typedef struct elite_driver_config_t {
     float servoj_lookahead_time;
     int32_t servoj_gain;
     float stopj_acc;
+    float servoj_extrapolate_max_time;
+    float servoj_decelerate_time;
+    float servoj_hold_velocity_threshold;
+    float servoj_hold_stable_time;
 } elite_driver_config_t;
 
 typedef struct elite_driver_robot_exception_t {
@@ -50,6 +54,7 @@ typedef struct elite_driver_robot_exception_t {
 } elite_driver_robot_exception_t;
 
 typedef void (*elite_driver_trajectory_result_cb_t)(elite_trajectory_motion_result_t result, void* user_data);
+typedef void (*elite_driver_trajectory_feedback_cb_t)(const elite_trajectory_motion_feedback_t* feedback, void* user_data);
 typedef void (*elite_driver_robot_exception_cb_t)(const elite_driver_robot_exception_t* ex, void* user_data);
 
 ELITE_C_EXPORT void elite_driver_config_set_default(elite_driver_config_t* config);
@@ -71,9 +76,16 @@ ELITE_C_EXPORT elite_c_status_t elite_driver_write_idle(elite_driver_handle_t* h
 ELITE_C_EXPORT elite_c_status_t elite_driver_set_trajectory_result_callback(elite_driver_handle_t* handle,
                                                                             elite_driver_trajectory_result_cb_t cb,
                                                                             void* user_data);
+ELITE_C_EXPORT elite_c_status_t elite_driver_set_trajectory_feedback_callback(elite_driver_handle_t* handle,
+                                                                              elite_driver_trajectory_feedback_cb_t cb,
+                                                                              void* user_data);
 ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_point(elite_driver_handle_t* handle, const double* positions6,
                                                                     float time, float blend_radius, int32_t cartesian,
                                                                     int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_point_with_speed(elite_driver_handle_t* handle,
+                                                                               const double* positions6, float blend_radius,
+                                                                               int32_t cartesian, float speed,
+                                                                               float acceleration, int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_driver_write_trajectory_control_action(elite_driver_handle_t* handle,
                                                                              elite_trajectory_control_action_t action,
                                                                              int32_t point_number, int32_t timeout_ms,

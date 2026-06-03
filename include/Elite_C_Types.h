@@ -123,6 +123,20 @@ typedef enum elite_trajectory_control_action_t {
     ELITE_TRAJECTORY_ACTION_START = 1,
 } elite_trajectory_control_action_t;
 
+typedef enum elite_trajectory_feedback_message_type_t {
+    ELITE_TRAJECTORY_FEEDBACK_ACTIVE_POINT = 1,
+    ELITE_TRAJECTORY_FEEDBACK_POINT_DONE = 2,
+    ELITE_TRAJECTORY_FEEDBACK_RESULT = 3,
+} elite_trajectory_feedback_message_type_t;
+
+typedef struct elite_trajectory_motion_feedback_t {
+    elite_trajectory_feedback_message_type_t message_type;
+    int32_t point_index;
+    int32_t total_points;
+    int32_t result;
+    double point[6];
+} elite_trajectory_motion_feedback_t;
+
 typedef enum elite_tool_voltage_t {
     ELITE_TOOL_VOLTAGE_OFF = 0,
     ELITE_TOOL_VOLTAGE_12V = 12,
@@ -172,6 +186,40 @@ typedef struct elite_version_info_t {
     uint32_t bugfix;
     uint32_t build;
 } elite_version_info_t;
+
+typedef enum elite_kinematic_error_t {
+    ELITE_KINEMATIC_ERROR_OK = 1,
+    ELITE_KINEMATIC_ERROR_SOLVER_NOT_ACTIVE = 2,
+    ELITE_KINEMATIC_ERROR_NO_SOLUTION = 3,
+} elite_kinematic_error_t;
+
+typedef struct elite_kinematics_result_t {
+    elite_kinematic_error_t kinematic_error;
+} elite_kinematics_result_t;
+
+typedef struct elite_pose_matrix_t {
+    double data[16];
+} elite_pose_matrix_t;
+
+typedef struct elite_pose_distance_t {
+    double linear_distance;
+    double angular_distance;
+} elite_pose_distance_t;
+
+typedef enum elite_pose_algebra_error_t {
+    ELITE_POSE_ALGEBRA_ERROR_SUCCESS = 0,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_INPUT = 1,
+    ELITE_POSE_ALGEBRA_ERROR_SINGULAR_MATRIX = 2,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_ROTATION_MATRIX = 3,
+    ELITE_POSE_ALGEBRA_ERROR_NUMERICAL_ERROR = 4,
+    ELITE_POSE_ALGEBRA_ERROR_UNSUPPORTED_OPERATION = 5,
+    ELITE_POSE_ALGEBRA_ERROR_INTERNAL_ERROR = 6,
+} elite_pose_algebra_error_t;
+
+typedef struct elite_pose_algebra_result_t {
+    elite_pose_algebra_error_t error;
+    const char* message;
+} elite_pose_algebra_result_t;
 
 #ifdef __cplusplus
 }

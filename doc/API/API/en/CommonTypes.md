@@ -69,6 +69,36 @@ typedef enum elite_trajectory_control_action_t {
 - `ELITE_TRAJECTORY_ACTION_NOOP`: Keepalive no-op action
 - `ELITE_TRAJECTORY_ACTION_START`: Start a new trajectory
 
+### Trajectory Feedback Message Type
+```c
+typedef enum elite_trajectory_feedback_message_type_t {
+    ELITE_TRAJECTORY_FEEDBACK_ACTIVE_POINT = 1,
+    ELITE_TRAJECTORY_FEEDBACK_POINT_DONE = 2,
+    ELITE_TRAJECTORY_FEEDBACK_RESULT = 3,
+} elite_trajectory_feedback_message_type_t;
+```
+
+- `ELITE_TRAJECTORY_FEEDBACK_ACTIVE_POINT`: The robot reports the active trajectory point
+- `ELITE_TRAJECTORY_FEEDBACK_POINT_DONE`: The robot reports that a trajectory point is finished
+- `ELITE_TRAJECTORY_FEEDBACK_RESULT`: The robot reports the final trajectory result
+
+### Trajectory Motion Feedback
+```c
+typedef struct elite_trajectory_motion_feedback_t {
+    elite_trajectory_feedback_message_type_t message_type;
+    int32_t point_index;
+    int32_t total_points;
+    int32_t result;
+    double point[6];
+} elite_trajectory_motion_feedback_t;
+```
+
+- `message_type`: Feedback message type.
+- `point_index`: Current point index.
+- `total_points`: Total number of trajectory points.
+- `result`: Result value for result feedback frames.
+- `point`: 6-element joint or Cartesian point reported by the robot.
+
 ### Freedrive Action
 ```c
 typedef enum elite_freedrive_action_t {
@@ -256,3 +286,83 @@ typedef enum elite_serial_stop_bits_t {
 
 - `ELITE_SERIAL_STOP_BITS_ONE`: 1 stop bit
 - `ELITE_SERIAL_STOP_BITS_TWO`: 2 stop bits
+
+## Kinematics Types
+
+### Kinematic Error
+```c
+typedef enum elite_kinematic_error_t {
+    ELITE_KINEMATIC_ERROR_OK = 1,
+    ELITE_KINEMATIC_ERROR_SOLVER_NOT_ACTIVE = 2,
+    ELITE_KINEMATIC_ERROR_NO_SOLUTION = 3,
+} elite_kinematic_error_t;
+```
+
+- `ELITE_KINEMATIC_ERROR_OK`: No kinematics error.
+- `ELITE_KINEMATIC_ERROR_SOLVER_NOT_ACTIVE`: The solver is not active.
+- `ELITE_KINEMATIC_ERROR_NO_SOLUTION`: No valid IK solution was found.
+
+### Kinematics Result
+```c
+typedef struct elite_kinematics_result_t {
+    elite_kinematic_error_t kinematic_error;
+} elite_kinematics_result_t;
+```
+
+- `kinematic_error`: Kinematics solver result code.
+
+## Pose Algebra Types
+
+### Pose Matrix
+```c
+typedef struct elite_pose_matrix_t {
+    double data[16];
+} elite_pose_matrix_t;
+```
+
+- ***Description***
+
+  Row-major 4x4 homogeneous pose matrix.
+
+### Pose Distance
+```c
+typedef struct elite_pose_distance_t {
+    double linear_distance;
+    double angular_distance;
+} elite_pose_distance_t;
+```
+
+- `linear_distance`: Translation distance in meters.
+- `angular_distance`: Orientation distance in radians.
+
+### Pose Algebra Error
+```c
+typedef enum elite_pose_algebra_error_t {
+    ELITE_POSE_ALGEBRA_ERROR_SUCCESS = 0,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_INPUT = 1,
+    ELITE_POSE_ALGEBRA_ERROR_SINGULAR_MATRIX = 2,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_ROTATION_MATRIX = 3,
+    ELITE_POSE_ALGEBRA_ERROR_NUMERICAL_ERROR = 4,
+    ELITE_POSE_ALGEBRA_ERROR_UNSUPPORTED_OPERATION = 5,
+    ELITE_POSE_ALGEBRA_ERROR_INTERNAL_ERROR = 6,
+} elite_pose_algebra_error_t;
+```
+
+- `ELITE_POSE_ALGEBRA_ERROR_SUCCESS`: Operation succeeded.
+- `ELITE_POSE_ALGEBRA_ERROR_INVALID_INPUT`: Input data is invalid.
+- `ELITE_POSE_ALGEBRA_ERROR_SINGULAR_MATRIX`: Matrix inversion failed because the matrix is singular.
+- `ELITE_POSE_ALGEBRA_ERROR_INVALID_ROTATION_MATRIX`: Rotation matrix is invalid.
+- `ELITE_POSE_ALGEBRA_ERROR_NUMERICAL_ERROR`: Numerical error occurred.
+- `ELITE_POSE_ALGEBRA_ERROR_UNSUPPORTED_OPERATION`: Operation is not supported.
+- `ELITE_POSE_ALGEBRA_ERROR_INTERNAL_ERROR`: Internal error occurred.
+
+### Pose Algebra Result
+```c
+typedef struct elite_pose_algebra_result_t {
+    elite_pose_algebra_error_t error;
+    const char* message;
+} elite_pose_algebra_result_t;
+```
+
+- `error`: Pose algebra operation result code.
+- `message`: Error details. The pointer is valid until the next call on the same pose algebra handle.

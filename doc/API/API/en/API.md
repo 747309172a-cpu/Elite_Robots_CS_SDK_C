@@ -14,4 +14,6 @@ Applicable SDK version: ***Use with the version of this repository***
 - [ControllerLog](./ControllerLog.md)
 - [SerialCommunication](./SerialCommunication.md)
 - [EliteDriver Config](./EliteDriverConfig.md)
+- [Kinematics](./Kinematics.md)
+- [PoseAlgebra](./PoseAlgebra.md)
 - [Common Types](./CommonTypes.md)

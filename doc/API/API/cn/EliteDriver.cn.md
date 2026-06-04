@@ -31,6 +31,27 @@ typedef void (*elite_driver_trajectory_result_cb_t)(
 - `result`：轨迹执行结果，取值见 [CommonTypes.cn.md](./CommonTypes.cn.md) 中的 `elite_trajectory_motion_result_t`。
 - `user_data`：注册回调时传入的用户透传指针。
 
+### 轨迹反馈回调类型
+```c
+typedef void (*elite_driver_trajectory_feedback_cb_t)(
+    const elite_trajectory_motion_feedback_t* feedback,
+    void* user_data
+);
+```
+
+- ***功能***
+
+  用于接收机器人上报的轨迹执行进度反馈帧。
+
+- ***参数***
+
+- `feedback`：轨迹反馈数据，字段见 [CommonTypes.cn.md](./CommonTypes.cn.md) 中的 `elite_trajectory_motion_feedback_t`。
+- `user_data`：注册回调时传入的用户透传指针。
+
+- ***注意事项***
+
+  `feedback` 指针仅在回调执行期间有效；如果调用方需要长期保存，应自行拷贝结构体内容。
+
 ### 机器人异常结构体
 ```c
 typedef struct elite_driver_robot_exception_t {
@@ -372,16 +393,22 @@ elite_c_status_t elite_driver_set_trajectory_result_callback(
     elite_driver_trajectory_result_cb_t cb,
     void* user_data
 );
+elite_c_status_t elite_driver_set_trajectory_feedback_callback(
+    elite_driver_handle_t* handle,
+    elite_driver_trajectory_feedback_cb_t cb,
+    void* user_data
+);
 ```
 
 - ***功能***
 
-  注册轨迹完成时的回调函数。 控制机器人的一种方式是将路点一次性发给机器人，当执行完成时，这里注册的回调函数将被触发。
+  注册轨迹完成结果回调或轨迹执行过程反馈回调。控制机器人的一种方式是将路点一次性发给机器人，当执行完成或机器人上报执行进度时，对应回调函数将被触发。
   
 - ***参数***
 
 - `handle`：驱动句柄。
 - `cb`：轨迹结果回调函数，回调结果类型为 `elite_trajectory_motion_result_t`，传 `NULL` 可取消注册。
+- 对于 `elite_driver_set_trajectory_feedback_callback()`，`cb` 为轨迹反馈回调函数，传 `NULL` 可取消注册。
 - `user_data`：用户透传指针，会原样传回回调。
 
 - ***返回值***
@@ -400,11 +427,20 @@ elite_c_status_t elite_driver_write_trajectory_point(
     int32_t cartesian,
     int32_t* out_success
 );
+elite_c_status_t elite_driver_write_trajectory_point_with_speed(
+    elite_driver_handle_t* handle,
+    const double* positions6,
+    float blend_radius,
+    int32_t cartesian,
+    float speed,
+    float acceleration,
+    int32_t* out_success
+);
 ```
 
 - ***功能***
 
-  向专门的socket写入轨迹路点。
+  向专门的 socket 写入轨迹路点。可使用指定到达时间的接口，也可使用带速度和加速度参数的接口。
 
 - ***参数***
 
@@ -413,11 +449,18 @@ elite_c_status_t elite_driver_write_trajectory_point(
 - `time`：到达该路点的时间。
 - `blend_radius`：两个路点之间的过渡半径。
 - `cartesian`：如果发送的是笛卡尔点位，则传 `1`；如果发送的是关节点位，则传 `0`。
+- `speed`：关节轨迹点的关节速度，或笛卡尔轨迹点的 TCP 速度。
+- `acceleration`：关节轨迹点的关节加速度，或笛卡尔轨迹点的 TCP 加速度。
 - `out_success`：返回轨迹点下发是否成功。
 
 - ***返回值***
 
   返回 `elite_c_status_t`。
+
+- ***注意事项***
+
+  `elite_driver_write_trajectory_point()` 适用于通过 `time` 指定到达时间的轨迹点。
+  `elite_driver_write_trajectory_point_with_speed()` 适用于通过 `speed` 和 `acceleration` 指定运动参数的轨迹点。
 
 ---
 

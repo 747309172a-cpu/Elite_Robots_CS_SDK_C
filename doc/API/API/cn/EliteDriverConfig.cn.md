@@ -28,6 +28,10 @@ typedef struct elite_driver_config_t {
     float servoj_lookahead_time;
     int32_t servoj_gain;
     float stopj_acc;
+    float servoj_extrapolate_max_time;
+    float servoj_decelerate_time;
+    float servoj_hold_velocity_threshold;
+    float servoj_hold_stable_time;
 } elite_driver_config_t;
 ```
 
@@ -45,6 +49,10 @@ typedef struct elite_driver_config_t {
 - `servoj_lookahead_time`：`servoj` 前瞻时间。
 - `servoj_gain`：`servoj` 伺服增益。
 - `stopj_acc`：`stopj` ：停止运动的加速度 (rad/s²)。
+- `servoj_extrapolate_max_time`：未收到新的 `servoj` 点位时，按恒速外推的最大持续时间，单位 s。
+- `servoj_decelerate_time`：外推速度线性减速到 0 的时间，单位 s。
+- `servoj_hold_velocity_threshold`：判断关节稳定并进入保持位置状态的速度阈值，单位 rad/s。
+- `servoj_hold_stable_time`：外推速度降为 0 后，锁定保持位置前需要持续稳定的时间，单位 s。
 
 ## 默认值
 
@@ -62,6 +70,10 @@ typedef struct elite_driver_config_t {
 - `servoj_lookahead_time = 0.1f`
 - `servoj_gain = 300`
 - `stopj_acc = 8.0f`
+- `servoj_extrapolate_max_time = 0.08f`
+- `servoj_decelerate_time = 0.01f`
+- `servoj_hold_velocity_threshold = 0.05f`
+- `servoj_hold_stable_time = 0.04f`
 ## 接口说明
 
 ### 设置默认配置

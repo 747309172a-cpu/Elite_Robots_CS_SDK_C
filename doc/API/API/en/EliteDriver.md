@@ -29,6 +29,27 @@ typedef void (*elite_driver_trajectory_result_cb_t)(
 - `result`: Trajectory motion result. See `elite_trajectory_motion_result_t` in [CommonTypes.md](./CommonTypes.md).
 - `user_data`: Opaque pointer provided during callback registration.
 
+### Trajectory Feedback Callback
+```c
+typedef void (*elite_driver_trajectory_feedback_cb_t)(
+    const elite_trajectory_motion_feedback_t* feedback,
+    void* user_data
+);
+```
+
+- ***Description***
+
+  Callback used to receive trajectory progress feedback frames reported by the robot.
+
+- ***Callback Parameters***
+
+- `feedback`: Trajectory feedback payload. See `elite_trajectory_motion_feedback_t` in [CommonTypes.md](./CommonTypes.md).
+- `user_data`: Opaque pointer provided during callback registration.
+
+- ***Notes***
+
+  The `feedback` pointer is only valid during the callback. Copy the payload if it must be retained after the callback returns.
+
 ### Robot Exception Payload
 ```c
 typedef struct elite_driver_robot_exception_t {
@@ -247,16 +268,22 @@ elite_c_status_t elite_driver_set_trajectory_result_callback(
     elite_driver_trajectory_result_cb_t cb,
     void* user_data
 );
+elite_c_status_t elite_driver_set_trajectory_feedback_callback(
+    elite_driver_handle_t* handle,
+    elite_driver_trajectory_feedback_cb_t cb,
+    void* user_data
+);
 ```
 
 - ***Description***
 
-  Registers the callback used to receive trajectory execution results.
+  Registers callbacks used to receive trajectory execution results or trajectory progress feedback.
 
 - ***Parameters***
 
 - `handle`: Driver handle.
 - `cb`: Trajectory result callback. Passing `NULL` unregisters the callback.
+- For `elite_driver_set_trajectory_feedback_callback()`, `cb` is the trajectory feedback callback. Passing `NULL` unregisters the callback.
 - `user_data`: Opaque pointer passed back to the callback.
 
 - ***Returns***
@@ -271,6 +298,15 @@ elite_c_status_t elite_driver_write_trajectory_point(
     float time,
     float blend_radius,
     int32_t cartesian,
+    int32_t* out_success
+);
+elite_c_status_t elite_driver_write_trajectory_point_with_speed(
+    elite_driver_handle_t* handle,
+    const double* positions6,
+    float blend_radius,
+    int32_t cartesian,
+    float speed,
+    float acceleration,
     int32_t* out_success
 );
 elite_c_status_t elite_driver_write_trajectory_control_action(
@@ -293,6 +329,8 @@ elite_c_status_t elite_driver_write_trajectory_control_action(
 - `time`: Motion time for the point.
 - `blend_radius`: Blend radius for the point.
 - `cartesian`: Pass `1` for a Cartesian point and `0` for a joint point.
+- `speed`: Joint speed for joint trajectory points or TCP speed for Cartesian trajectory points.
+- `acceleration`: Joint acceleration for joint trajectory points or TCP acceleration for Cartesian trajectory points.
 - `action`: Trajectory control action. See `elite_trajectory_control_action_t` in [CommonTypes.md](./CommonTypes.md).
 - `point_number`: Expected number of points for the trajectory command.
 - `timeout_ms`: Timeout for the next expected control message.
@@ -305,6 +343,7 @@ elite_c_status_t elite_driver_write_trajectory_control_action(
 - ***Notes***
 
   After sending `START`, keep sending the next command within the timeout window. `NOOP` may be used as a keepalive when needed.
+  Use `elite_driver_write_trajectory_point()` when each point uses a target time. Use `elite_driver_write_trajectory_point_with_speed()` when the robot should use speed and acceleration parameters instead.
 
 ### Freedrive Command
 ```c

@@ -14,4 +14,6 @@
 - [远程升级](./RemoteUpgrade.cn.md)
 - [控制器日志](./ControllerLog.cn.md)
 - [串口通讯](./SerialCommunication.cn.md)
+- [运动学](./Kinematics.cn.md)
+- [位姿代数](./PoseAlgebra.cn.md)
 - [共享类型](./CommonTypes.cn.md)

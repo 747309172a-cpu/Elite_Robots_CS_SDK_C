@@ -71,6 +71,38 @@ typedef enum elite_trajectory_control_action_t {
 - `ELITE_TRAJECTORY_ACTION_NOOP`：空操作，用于保活防止超时
 - `ELITE_TRAJECTORY_ACTION_START`：启动新的轨迹运动
 
+### 轨迹反馈消息类型
+
+```c
+typedef enum elite_trajectory_feedback_message_type_t {
+    ELITE_TRAJECTORY_FEEDBACK_ACTIVE_POINT = 1,
+    ELITE_TRAJECTORY_FEEDBACK_POINT_DONE = 2,
+    ELITE_TRAJECTORY_FEEDBACK_RESULT = 3,
+} elite_trajectory_feedback_message_type_t;
+```
+
+- `ELITE_TRAJECTORY_FEEDBACK_ACTIVE_POINT`：机器人反馈当前活动轨迹点。
+- `ELITE_TRAJECTORY_FEEDBACK_POINT_DONE`：机器人反馈某个轨迹点已完成。
+- `ELITE_TRAJECTORY_FEEDBACK_RESULT`：机器人反馈轨迹最终结果。
+
+### 轨迹运动反馈结构体
+
+```c
+typedef struct elite_trajectory_motion_feedback_t {
+    elite_trajectory_feedback_message_type_t message_type;
+    int32_t point_index;
+    int32_t total_points;
+    int32_t result;
+    double point[6];
+} elite_trajectory_motion_feedback_t;
+```
+
+- `message_type`：反馈消息类型。
+- `point_index`：当前轨迹点序号。
+- `total_points`：轨迹总点数。
+- `result`：结果反馈帧中的结果值。
+- `point`：机器人反馈的 6 维关节或笛卡尔点位。
+
 ### Freedrive 动作
 
 ```c
@@ -263,3 +295,89 @@ typedef enum elite_serial_stop_bits_t {
     ELITE_SERIAL_STOP_BITS_TWO = 2,
 } elite_serial_stop_bits_t;
 ```
+
+## 运动学类型
+
+### 运动学错误码
+
+```c
+typedef enum elite_kinematic_error_t {
+    ELITE_KINEMATIC_ERROR_OK = 1,
+    ELITE_KINEMATIC_ERROR_SOLVER_NOT_ACTIVE = 2,
+    ELITE_KINEMATIC_ERROR_NO_SOLUTION = 3,
+} elite_kinematic_error_t;
+```
+
+- `ELITE_KINEMATIC_ERROR_OK`：无错误。
+- `ELITE_KINEMATIC_ERROR_SOLVER_NOT_ACTIVE`：求解器未激活。
+- `ELITE_KINEMATIC_ERROR_NO_SOLUTION`：未找到有效 IK 解。
+
+### 运动学结果结构体
+
+```c
+typedef struct elite_kinematics_result_t {
+    elite_kinematic_error_t kinematic_error;
+} elite_kinematics_result_t;
+```
+
+- `kinematic_error`：运动学求解结果错误码。
+
+## 位姿代数类型
+
+### 位姿矩阵
+
+```c
+typedef struct elite_pose_matrix_t {
+    double data[16];
+} elite_pose_matrix_t;
+```
+
+- ***功能***
+
+  按行优先顺序存储的 4x4 齐次位姿矩阵。
+
+### 位姿距离结构体
+
+```c
+typedef struct elite_pose_distance_t {
+    double linear_distance;
+    double angular_distance;
+} elite_pose_distance_t;
+```
+
+- `linear_distance`：位置距离，单位 m。
+- `angular_distance`：姿态角距离，单位 rad。
+
+### 位姿代数错误码
+
+```c
+typedef enum elite_pose_algebra_error_t {
+    ELITE_POSE_ALGEBRA_ERROR_SUCCESS = 0,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_INPUT = 1,
+    ELITE_POSE_ALGEBRA_ERROR_SINGULAR_MATRIX = 2,
+    ELITE_POSE_ALGEBRA_ERROR_INVALID_ROTATION_MATRIX = 3,
+    ELITE_POSE_ALGEBRA_ERROR_NUMERICAL_ERROR = 4,
+    ELITE_POSE_ALGEBRA_ERROR_UNSUPPORTED_OPERATION = 5,
+    ELITE_POSE_ALGEBRA_ERROR_INTERNAL_ERROR = 6,
+} elite_pose_algebra_error_t;
+```
+
+- `ELITE_POSE_ALGEBRA_ERROR_SUCCESS`：操作成功。
+- `ELITE_POSE_ALGEBRA_ERROR_INVALID_INPUT`：输入数据非法。
+- `ELITE_POSE_ALGEBRA_ERROR_SINGULAR_MATRIX`：矩阵奇异，无法求逆。
+- `ELITE_POSE_ALGEBRA_ERROR_INVALID_ROTATION_MATRIX`：旋转矩阵非法。
+- `ELITE_POSE_ALGEBRA_ERROR_NUMERICAL_ERROR`：数值计算错误。
+- `ELITE_POSE_ALGEBRA_ERROR_UNSUPPORTED_OPERATION`：不支持的操作。
+- `ELITE_POSE_ALGEBRA_ERROR_INTERNAL_ERROR`：内部错误。
+
+### 位姿代数结果结构体
+
+```c
+typedef struct elite_pose_algebra_result_t {
+    elite_pose_algebra_error_t error;
+    const char* message;
+} elite_pose_algebra_result_t;
+```
+
+- `error`：位姿代数操作结果错误码。
+- `message`：错误说明字符串，该指针在同一个位姿代数句柄下一次调用前有效。

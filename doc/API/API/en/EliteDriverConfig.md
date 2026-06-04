@@ -28,6 +28,10 @@ typedef struct elite_driver_config_t {
     float servoj_lookahead_time;
     int32_t servoj_gain;
     float stopj_acc;
+    float servoj_extrapolate_max_time;
+    float servoj_decelerate_time;
+    float servoj_hold_velocity_threshold;
+    float servoj_hold_stable_time;
 } elite_driver_config_t;
 ```
 
@@ -45,6 +49,10 @@ typedef struct elite_driver_config_t {
 - `servoj_lookahead_time`: `servoj` lookahead time.
 - `servoj_gain`: `servoj` servo gain.
 - `stopj_acc`: `stopj` deceleration in rad/s^2.
+- `servoj_extrapolate_max_time`: Maximum duration in seconds for constant-velocity extrapolation when no new `servoj` point arrives.
+- `servoj_decelerate_time`: Deceleration duration in seconds used to ramp extrapolation speed to zero.
+- `servoj_hold_velocity_threshold`: Joint velocity threshold in rad/s used to decide when joints are stable enough to lock hold position.
+- `servoj_hold_stable_time`: Stable duration in seconds required before locking hold position after extrapolation speed reaches zero.
 
 ## Default Values
 
@@ -62,6 +70,10 @@ After calling `elite_driver_config_set_default()`, the fields are initialized as
 - `servoj_lookahead_time = 0.1f`
 - `servoj_gain = 300`
 - `stopj_acc = 8.0f`
+- `servoj_extrapolate_max_time = 0.08f`
+- `servoj_decelerate_time = 0.01f`
+- `servoj_hold_velocity_threshold = 0.05f`
+- `servoj_hold_stable_time = 0.04f`
 
 ## API Reference
 

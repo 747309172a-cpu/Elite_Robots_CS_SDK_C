@@ -184,6 +184,78 @@ elite_c_status_t elite_primary_send_script(elite_primary_handle_t* handle, const
     return run_with_handle(handle, [&]() { *out_success = handle->primary->sendScript(script) ? 1 : 0; });
 }
 
+elite_c_status_t elite_primary_power_on(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->powerOn() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_power_off(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->powerOff() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_brake_release(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->brakeRelease() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_pause_program(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->pauseProgram() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_stop_program(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->stopProgram() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_unlock_protective_stop(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->unlockProtectiveStop() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_safety_system_restart(elite_primary_handle_t* handle, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->safetySystemRestart() ? 1 : 0; });
+}
+
+elite_c_status_t elite_primary_set_speed_scaling(elite_primary_handle_t* handle, int32_t scaling, int32_t* out_success) {
+    if (!out_success) {
+        set_global_error("out_success is null");
+        return ELITE_C_STATUS_INVALID_ARGUMENT;
+    }
+
+    return run_with_handle(handle, [&]() { *out_success = handle->primary->setSpeedScaling(scaling) ? 1 : 0; });
+}
+
 elite_c_status_t elite_primary_get_local_ip(elite_primary_handle_t* handle, char* out_buffer, int32_t buffer_len,
                                             int32_t* out_required_len) {
     if (!handle) {

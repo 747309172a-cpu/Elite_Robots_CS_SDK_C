@@ -42,6 +42,15 @@ ELITE_C_EXPORT elite_c_status_t elite_primary_connect(elite_primary_handle_t* ha
 ELITE_C_EXPORT elite_c_status_t elite_primary_disconnect(elite_primary_handle_t* handle);
 ELITE_C_EXPORT elite_c_status_t elite_primary_send_script(elite_primary_handle_t* handle, const char* script,
                                                           int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_power_on(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_power_off(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_brake_release(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_pause_program(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_stop_program(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_unlock_protective_stop(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_safety_system_restart(elite_primary_handle_t* handle, int32_t* out_success);
+ELITE_C_EXPORT elite_c_status_t elite_primary_set_speed_scaling(elite_primary_handle_t* handle, int32_t scaling,
+                                                                int32_t* out_success);
 ELITE_C_EXPORT elite_c_status_t elite_primary_get_local_ip(elite_primary_handle_t* handle, char* out_buffer, int32_t buffer_len,
                                                            int32_t* out_required_len);
 //在 C++ 里是泛化入口（可取不同包类型），但 C 接口不适合直接暴露这种泛型/模板风格的接口，所以这里只提供一个获取运动学信息的接口，后续如果有其他包类型需要暴露，可以再增加对应的接口
